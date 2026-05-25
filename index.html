@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>この漢字読める？クイズ</title>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8398161859137802"
+     crossorigin="anonymous"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  background:linear-gradient(135deg,#111827,#312e81,#7c2d12);
+  color:#fff;
+  min-height:100vh;
+}
+header{
+  text-align:center;
+  padding:26px 14px;
+}
+header h1{
+  margin:0;
+  font-size:30px;
+}
+header p{
+  opacity:.85;
+}
+.container{
+  max-width:760px;
+  margin:auto;
+  padding:16px;
+}
+.ad{
+  background:#fff;
+  border-radius:16px;
+  padding:10px;
+  margin:12px 0 20px;
+}
+.card{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:24px;
+  padding:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
+}
+.info{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:18px;
+  font-weight:bold;
+}
+.badge{
+  background:rgba(255,255,255,.18);
+  padding:8px 12px;
+  border-radius:999px;
+}
+.kanji{
+  text-align:center;
+  font-size:76px;
+  font-weight:900;
+  letter-spacing:.08em;
+  margin:24px 0 8px;
+  text-shadow:0 8px 20px rgba(0,0,0,.35);
+}
+.hint{
+  text-align:center;
+  opacity:.85;
+  margin-bottom:24px;
+}
+.options{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+button{
+  border:none;
+  border-radius:16px;
+  padding:16px;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+  background:#fff;
+  color:#111827;
+  transition:.18s;
+}
+button:hover{
+  transform:translateY(-2px);
+  background:#fde68a;
+}
+button.correct{
+  background:#22c55e;
+  color:white;
+}
+button.wrong{
+  background:#ef4444;
+  color:white;
+}
+.result{
+  margin-top:18px;
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  min-height:32px;
+}
+.explain{
+  text-align:center;
+  opacity:.9;
+  min-height:26px;
+}
+.end{
+  text-align:center;
+  display:none;
+}
+.end h2{
+  font-size:30px;
+}
+.restart{
+  background:#facc15;
+}
+.progress{
+  width:100%;
+  height:10px;
+  background:rgba(255,255,255,.18);
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#facc15,#fb923c);
+  transition:.3s;
+}
+@media(max-width:520px){
+  .kanji{font-size:58px}
+  header h1{font-size:24px}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <h1>この漢字読める？クイズ</h1>
+  <p>難読漢字を読んで、語彙力をチェック！</p>
+</header>
+
+<div class="container">
+
+  <div class="ad">
+    <!-- UIゲーム -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-8398161859137802"
+         data-ad-slot="6325875393"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+
+  <div class="card" id="quizBox">
+    <div class="info">
+      <div class="badge" id="count">1 / 20</div>
+      <div class="badge" id="score">正解 0</div>
+    </div>
+
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
+
+    <div class="kanji" id="kanji">檸檬</div>
+    <div class="hint" id="hint">この漢字の読み方は？</div>
+
+    <div class="options" id="options"></div>
+
+    <div class="result" id="result"></div>
+    <div class="explain" id="explain"></div>
+  </div>
+
+  <div class="card end" id="endBox">
+    <h2>結果発表</h2>
+    <p id="finalScore"></p>
+    <p id="rank"></p>
+    <button class="restart" onclick="restartQuiz()">もう一度挑戦する</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {kanji:"檸檬", answer:"れもん", options:["れもん","みかん","ざくろ","かりん"], explain:"檸檬は果物のレモンです。"},
+  {kanji:"蒲公英", answer:"たんぽぽ", options:["たんぽぽ","ひまわり","あじさい","すみれ"], explain:"蒲公英は春に咲くタンポポです。"},
+  {kanji:"向日葵", answer:"ひまわり", options:["ひまわり","あさがお","たんぽぽ","つばき"], explain:"太陽の方を向く花、向日葵です。"},
+  {kanji:"紫陽花", answer:"あじさい", options:["あじさい","すずらん","ぼたん","ききょう"], explain:"梅雨の時期によく見る花です。"},
+  {kanji:"秋刀魚", answer:"さんま", options:["さんま","さば","いわし","あじ"], explain:"秋においしい魚、秋刀魚です。"},
+  {kanji:"鰯", answer:"いわし", options:["いわし","かつお","まぐろ","たい"], explain:"鰯は魚へんに弱いと書きます。"},
+  {kanji:"鯖", answer:"さば", options:["さば","さけ","ぶり","こい"], explain:"鯖は青魚の代表です。"},
+  {kanji:"鰹", answer:"かつお", options:["かつお","あゆ","うなぎ","ひらめ"], explain:"鰹節にも使われる魚です。"},
+  {kanji:"海月", answer:"くらげ", options:["くらげ","ひとで","いるか","くじら"], explain:"海に浮かぶクラゲのことです。"},
+  {kanji:"海豚", answer:"いるか", options:["いるか","あざらし","くじら","らっこ"], explain:"海豚はイルカと読みます。"},
+  {kanji:"河豚", answer:"ふぐ", options:["ふぐ","なまず","こい","うなぎ"], explain:"毒を持つ魚として有名です。"},
+  {kanji:"土竜", answer:"もぐら", options:["もぐら","とかげ","へび","ねずみ"], explain:"土の中にいる動物、モグラです。"},
+  {kanji:"百足", answer:"むかで", options:["むかで","あり","くも","ばった"], explain:"足が多い虫、ムカデです。"},
+  {kanji:"蜻蛉", answer:"とんぼ", options:["とんぼ","せみ","ちょう","ほたる"], explain:"秋の虫としても知られます。"},
+  {kanji:"蟷螂", answer:"かまきり", options:["かまきり","こおろぎ","ばった","かなぶん"], explain:"鎌のような前脚を持つ虫です。"},
+  {kanji:"時雨", answer:"しぐれ", options:["しぐれ","こさめ","あられ","つゆ"], explain:"時雨は降ったり止んだりする雨です。"},
+  {kanji:"五月雨", answer:"さみだれ", options:["さみだれ","ゆうだち","しぐれ","こぬかあめ"], explain:"旧暦五月ごろの長雨を指します。"},
+  {kanji:"不如帰", answer:"ほととぎす", options:["ほととぎす","うぐいす","すずめ","つばめ"], explain:"鳥の名前です。"},
+  {kanji:"雲雀", answer:"ひばり", options:["ひばり","からす","はと","つぐみ"], explain:"春の空で鳴く鳥として有名です。"},
+  {kanji:"山茶花", answer:"さざんか", options:["さざんか","つばき","あやめ","ぼたん"], explain:"冬に咲く花として知られます。"},
+  {kanji:"無花果", answer:"いちじく", options:["いちじく","ざくろ","びわ","あけび"], explain:"花が見えにくい果物なので無花果です。"},
+  {kanji:"木通", answer:"あけび", options:["あけび","くるみ","かりん","びわ"], explain:"秋の果実、あけびです。"},
+  {kanji:"団栗", answer:"どんぐり", options:["どんぐり","まつぼっくり","くるみ","ぎんなん"], explain:"秋に落ちる木の実です。"},
+  {kanji:"銀杏", answer:"ぎんなん", options:["ぎんなん","どんぐり","くるみ","あんず"], explain:"イチョウの実です。"},
+  {kanji:"独楽", answer:"こま", options:["こま","けんだま","だるま","おはじき"], explain:"回して遊ぶ昔ながらのおもちゃです。"},
+  {kanji:"硝子", answer:"がらす", options:["がらす","れんが","かわら","すな"], explain:"窓などに使われるガラスです。"},
+  {kanji:"煙草", answer:"たばこ", options:["たばこ","こうちゃ","まっちゃ","くすり"], explain:"煙草はタバコと読みます。"},
+  {kanji:"欠伸", answer:"あくび", options:["あくび","しゃっくり","くしゃみ","ねごと"], explain:"眠い時などに出るあくびです。"},
+  {kanji:"胡桃", answer:"くるみ", options:["くるみ","あんず","すもも","かりん"], explain:"ナッツの一種です。"},
+  {kanji:"珈琲", answer:"こーひー", options:["こーひー","こうちゃ","こーら","ここあ"], explain:"珈琲はコーヒーと読みます。"}
+];
+
+let quiz = [];
+let current = 0;
+let score = 0;
+const total = 20;
+
+function shuffle(array){
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function startQuiz(){
+  quiz = shuffle([...questions]).slice(0,total);
+  current = 0;
+  score = 0;
+  document.getElementById("quizBox").style.display = "block";
+  document.getElementById("endBox").style.display = "none";
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = quiz[current];
+
+  document.getElementById("count").textContent = `${current + 1} / ${total}`;
+  document.getElementById("score").textContent = `正解 ${score}`;
+  document.getElementById("kanji").textContent = q.kanji;
+  document.getElementById("result").textContent = "";
+  document.getElementById("explain").textContent = "";
+  document.getElementById("bar").style.width = `${(current / total) * 100}%`;
+
+  const optionsBox = document.getElementById("options");
+  optionsBox.innerHTML = "";
+
+  shuffle([...q.options]).forEach(option => {
+    const btn = document.createElement("button");
+    btn.textContent = option;
+    btn.onclick = () => checkAnswer(btn, option);
+    optionsBox.appendChild(btn);
+  });
+}
+
+function checkAnswer(btn, selected){
+  const q = quiz[current];
+  const buttons = document.querySelectorAll("#options button");
+
+  buttons.forEach(b => {
+    b.disabled = true;
+    if(b.textContent === q.answer) b.classList.add("correct");
+  });
+
+  if(selected === q.answer){
+    score++;
+    document.getElementById("result").textContent = "正解！";
+  }else{
+    btn.classList.add("wrong");
+    document.getElementById("result").textContent = `不正解… 正解は「${q.answer}」`;
+  }
+
+  document.getElementById("explain").textContent = q.explain;
+  document.getElementById("score").textContent = `正解 ${score}`;
+
+  setTimeout(() => {
+    current++;
+    if(current < total){
+      showQuestion();
+    }else{
+      showResult();
+    }
+  }, 1200);
+}
+
+function showResult(){
+  document.getElementById("quizBox").style.display = "none";
+  document.getElementById("endBox").style.display = "block";
+  document.getElementById("bar").style.width = "100%";
+
+  document.getElementById("finalScore").textContent = `${total}問中 ${score}問 正解！`;
+
+  let rank = "";
+  if(score >= 18) rank = "漢字マスター級！かなり読めています。";
+  else if(score >= 14) rank = "上級者！難読漢字に強いです。";
+  else if(score >= 9) rank = "中級者！まだ伸びしろあり。";
+  else rank = "初心者！もう一度挑戦して覚えよう。";
+
+  document.getElementById("rank").textContent = rank;
+}
+
+function restartQuiz(){
+  startQuiz();
+}
+
+startQuiz();
+</script>
+</body>
+</html>
